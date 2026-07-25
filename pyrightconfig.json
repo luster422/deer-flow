@@ -1,0 +1,9 @@
+{
+  "include": ["backend"],
+  "executionEnvironments": [
+    {
+      "root": "backend",
+      "extraPaths": ["backend/packages/harness"]
+    }
+  ]
+}
