@@ -25,6 +25,7 @@ from app.gateway.routers import (
     feedback,
     github_webhooks,
     input_polish,
+    knowledge_bases,
     mcp,
     memory,
     models,
@@ -286,6 +287,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         except Exception:
             logger.exception("Failed to initialize scheduled task service")
 
+        knowledge_ingestion_service = getattr(app.state, "knowledge_ingestion_service", None)
+        if knowledge_ingestion_service is not None:
+            await knowledge_ingestion_service.start()
+            logger.info("Knowledge ingestion service started")
+
         yield
 
         try:
@@ -314,6 +320,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 await app.state.scheduled_task_service.stop()
             except Exception:
                 logger.exception("Failed to stop scheduled task service")
+
+        if getattr(app.state, "knowledge_ingestion_service", None) is not None:
+            try:
+                await app.state.knowledge_ingestion_service.stop()
+            except Exception:
+                logger.exception("Failed to stop knowledge ingestion service")
 
         try:
             from deerflow.community.browser_automation import get_browser_session_manager
@@ -512,6 +524,9 @@ This gateway provides runtime endpoints for agent runs plus custom endpoints for
 
     # Memory API is mounted at /api/memory
     app.include_router(memory.router)
+
+    # Knowledge base management, ingestion, search preview, and bindings
+    app.include_router(knowledge_bases.router)
 
     # Skills API is mounted at /api/skills
     app.include_router(skills.router)

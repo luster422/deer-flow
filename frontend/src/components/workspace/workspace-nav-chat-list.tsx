@@ -1,6 +1,11 @@
 "use client";
 
-import { BotIcon, CalendarClock, MessagesSquare } from "lucide-react";
+import {
+  BotIcon,
+  CalendarClock,
+  DatabaseIcon,
+  MessagesSquare,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,12 +21,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAgentsApiEnabled } from "@/core/agents";
+import { useKnowledgeBasesEnabled } from "@/core/features";
 import { useI18n } from "@/core/i18n/hooks";
 
 export function WorkspaceNavChatList() {
   const { t } = useI18n();
   const pathname = usePathname();
   const { enabled: agentsEnabled } = useAgentsApiEnabled();
+  const { enabled: knowledgeEnabled } = useKnowledgeBasesEnabled();
   return (
     <SidebarGroup className="pt-1">
       <SidebarMenu>
@@ -33,6 +40,22 @@ export function WorkspaceNavChatList() {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
+        {knowledgeEnabled && (
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={pathname.startsWith("/workspace/knowledge-bases")}
+              asChild
+            >
+              <Link
+                className="text-muted-foreground"
+                href="/workspace/knowledge-bases"
+              >
+                <DatabaseIcon />
+                <span>{t.sidebar.knowledgeBases}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
         <SidebarMenuItem>
           {agentsEnabled ? (
             <SidebarMenuButton

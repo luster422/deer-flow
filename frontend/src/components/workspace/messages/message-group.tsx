@@ -3,6 +3,7 @@ import {
   BookOpenTextIcon,
   ChevronUp,
   CoinsIcon,
+  DatabaseIcon,
   FolderOpenIcon,
   GlobeIcon,
   LightbulbIcon,
@@ -639,6 +640,32 @@ function ToolCall({
         )}
       </ChainOfThoughtStep>
     );
+  } else if (name === "knowledge_search") {
+    const query = typeof args.query === "string" ? args.query : null;
+    const sources = extractKnowledgeSources(result);
+    return (
+      <ChainOfThoughtStep
+        key={id}
+        label={resolveLabel(
+          query
+            ? t.toolCalls.searchKnowledgeFor(query)
+            : t.toolCalls.searchKnowledge,
+        )}
+        icon={DatabaseIcon}
+      >
+        {sources.length > 0 && (
+          <ChainOfThoughtSearchResults>
+            {sources.map((source) => (
+              <ChainOfThoughtSearchResult key={source.url}>
+                <a href={source.url} target="_blank" rel="noopener noreferrer">
+                  {source.title}
+                </a>
+              </ChainOfThoughtSearchResult>
+            ))}
+          </ChainOfThoughtSearchResults>
+        )}
+      </ChainOfThoughtStep>
+    );
   } else if (name === "web_search") {
     let label: React.ReactNode = t.toolCalls.searchForRelatedInfo;
     if (typeof args.query === "string") {
@@ -893,6 +920,28 @@ interface BrowserViewMeta {
   screenshot: string;
   url?: string;
   title?: string;
+}
+
+interface KnowledgeSource {
+  title: string;
+  url: string;
+}
+
+export function extractKnowledgeSources(result: unknown): KnowledgeSource[] {
+  if (typeof result !== "string") {
+    return [];
+  }
+  const sources = new Map<string, KnowledgeSource>();
+  const citationPattern =
+    /\[citation:([^\]]+)\]\((\/api\/knowledge-bases\/[^\s)]+)\)/g;
+  for (const match of result.matchAll(citationPattern)) {
+    const title = match[1];
+    const url = match[2];
+    if (title && url) {
+      sources.set(url, { title, url });
+    }
+  }
+  return [...sources.values()];
 }
 
 function findBrowserViewMeta(

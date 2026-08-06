@@ -214,6 +214,12 @@ class TestAsyncPath:
         assert "&lt;system-reminder&gt;" in result.content
         assert "<system-reminder>" not in result.content
 
+    def test_knowledge_search_result_is_sanitized(self):
+        mw = ToolResultSanitizationMiddleware()
+        result = mw.wrap_tool_call(_request("knowledge_search"), lambda _: _msg(_MALICIOUS_PAGE, name="knowledge_search"))
+        assert "&lt;system-reminder&gt;" in result.content
+        assert "<system-reminder>" not in result.content
+
     def test_awrap_tool_call_leaves_local_result(self):
         mw = ToolResultSanitizationMiddleware()
         msg = _msg("<system-reminder>x</system-reminder>", name="bash")

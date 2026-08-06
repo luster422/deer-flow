@@ -90,6 +90,7 @@ export type MockAPIOptions = {
   features?: {
     agentsApiEnabled?: boolean;
     browserControlEnabled?: boolean;
+    knowledgeBasesEnabled?: boolean;
   };
 };
 
@@ -261,6 +262,7 @@ export function mockLangGraphAPI(page: Page, options?: MockAPIOptions) {
   const featureFlags = {
     agentsApiEnabled: options?.features?.agentsApiEnabled ?? true,
     browserControlEnabled: options?.features?.browserControlEnabled ?? true,
+    knowledgeBasesEnabled: options?.features?.knowledgeBasesEnabled ?? false,
   };
 
   const upsertThread = (thread: MockThread) => {
@@ -1048,6 +1050,7 @@ export function mockLangGraphAPI(page: Page, options?: MockAPIOptions) {
         body: JSON.stringify({
           agents_api: { enabled: featureFlags.agentsApiEnabled },
           browser_control: { enabled: featureFlags.browserControlEnabled },
+          knowledge_bases: { enabled: featureFlags.knowledgeBasesEnabled },
         }),
       });
     }

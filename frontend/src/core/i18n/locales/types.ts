@@ -200,8 +200,49 @@ export interface Translations {
     demoChats: string;
     agents: string;
     scheduledTasks: string;
+    knowledgeBases: string;
     agentsDisabledTooltip: string;
     channels: string;
+  };
+
+  knowledgeBases: {
+    title: string;
+    subtitle: string;
+    create: string;
+    createTitle: string;
+    createDescription: string;
+    namePlaceholder: string;
+    descriptionPlaceholder: string;
+    emptyTitle: string;
+    emptyDescription: string;
+    summary: (documents: number, chunks: number) => string;
+    upload: string;
+    document: string;
+    size: string;
+    chunks: string;
+    updated: string;
+    state: string;
+    noDocuments: string;
+    retry: string;
+    searchTitle: string;
+    searchPlaceholder: string;
+    noResults: string;
+    deleteTitle: string;
+    deleteDescription: string;
+    selectorLabel: string;
+    selectorEmpty: string;
+    selectorManage: string;
+    status: {
+      active: string;
+      queued: string;
+      parsing: string;
+      embedding: string;
+      indexing: string;
+      ready: string;
+      failed: string;
+      deleting: string;
+      error: string;
+    };
   };
 
   // Scheduled tasks
@@ -484,6 +525,8 @@ export interface Translations {
     searchFor: (query: string) => string;
     searchForRelatedImagesFor: (query: string) => string;
     searchOnWebFor: (query: string) => string;
+    searchKnowledge: string;
+    searchKnowledgeFor: (query: string) => string;
     viewWebPage: string;
     listFolder: string;
     readFile: string;

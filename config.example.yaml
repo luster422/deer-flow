@@ -15,7 +15,7 @@
 # ============================================================================
 # Bump this number when the config schema changes.
 # Run `make config-upgrade` to merge new fields into your local config.yaml.
-config_version: 29
+config_version: 30
 
 # ============================================================================
 # Logging
@@ -1703,6 +1703,45 @@ memory:
     #                         = bundled core/prompts/. Supports per-agent subdirectories.
     # patterns_dir: ""            # empty = bundled defaults
     # prompts_dir: ""             # empty = bundled defaults
+
+# ============================================================================
+# Knowledge Bases / RAG (startup-only)
+# ============================================================================
+# Disabled by default. When enabled, Gateway constructs the parser, embedding
+# provider, local hybrid index, and ingestion workers at startup. Missing or
+# invalid embedding credentials then fail startup instead of silently falling
+# back to keyword-only retrieval.
+knowledge:
+  enabled: false
+  storage_path: null # null -> DEER_FLOW_HOME; sources live under users/{user_id}/knowledge
+  parser:
+    use: deerflow.knowledge.parsing.markitdown:MarkItDownParser
+    allowed_extensions: [md, txt, pdf, docx, pptx, xlsx]
+  chunking:
+    target_tokens: 500
+    overlap_tokens: 80
+    max_tokens: 900
+    token_counting: tiktoken
+  embedding:
+    use: langchain_openai:OpenAIEmbeddings
+    model: text-embedding-3-small
+    api_key: null # set to $OPENAI_API_KEY when enabling, or rely on provider environment lookup
+    batch_size: 64
+    timeout_seconds: 60
+  index:
+    use: deerflow.knowledge.retrieval.local:LocalHybridIndex
+    path: null # null -> {DEER_FLOW_HOME}/knowledge/index.sqlite
+  retrieval:
+    top_k: 6
+    vector_candidate_k: 30
+    text_candidate_k: 30
+    rrf_k: 60
+    mmr_lambda: 0.8
+    max_context_tokens: 4000
+  ingestion:
+    workers: 2
+    lease_seconds: 120
+    max_attempts: 3
 
 # ============================================================================
 # Custom Agent Management API

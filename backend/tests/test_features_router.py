@@ -8,7 +8,7 @@ from app.gateway.deps import get_config
 from app.gateway.routers import features
 
 
-def _app_with_config(*, agents_api_enabled: bool, browser_enabled: bool = False, browser_extra: dict | None = None) -> FastAPI:
+def _app_with_config(*, agents_api_enabled: bool, browser_enabled: bool = False, browser_extra: dict | None = None, knowledge_enabled: bool = False) -> FastAPI:
     app = FastAPI()
     app.include_router(features.router)
     tools = (
@@ -18,7 +18,7 @@ def _app_with_config(*, agents_api_enabled: bool, browser_enabled: bool = False,
         if browser_enabled
         else []
     )
-    fake_config = SimpleNamespace(agents_api=SimpleNamespace(enabled=agents_api_enabled), tools=tools)
+    fake_config = SimpleNamespace(agents_api=SimpleNamespace(enabled=agents_api_enabled), tools=tools, knowledge=SimpleNamespace(enabled=knowledge_enabled))
     app.dependency_overrides[get_config] = lambda: fake_config
     return app
 
@@ -27,14 +27,21 @@ def test_features_reports_agents_api_enabled() -> None:
     with TestClient(_app_with_config(agents_api_enabled=True)) as client:
         response = client.get("/api/features")
     assert response.status_code == 200
-    assert response.json() == {"agents_api": {"enabled": True}, "browser_control": {"enabled": False}}
+    assert response.json() == {"agents_api": {"enabled": True}, "browser_control": {"enabled": False}, "knowledge_bases": {"enabled": False}}
 
 
 def test_features_reports_agents_api_disabled() -> None:
     with TestClient(_app_with_config(agents_api_enabled=False)) as client:
         response = client.get("/api/features")
     assert response.status_code == 200
-    assert response.json() == {"agents_api": {"enabled": False}, "browser_control": {"enabled": False}}
+    assert response.json() == {"agents_api": {"enabled": False}, "browser_control": {"enabled": False}, "knowledge_bases": {"enabled": False}}
+
+
+def test_features_reports_knowledge_bases_enabled() -> None:
+    with TestClient(_app_with_config(agents_api_enabled=False, knowledge_enabled=True)) as client:
+        response = client.get("/api/features")
+    assert response.status_code == 200
+    assert response.json()["knowledge_bases"] == {"enabled": True}
 
 
 def test_features_reports_browser_control_enabled_when_configured_and_runtime_available() -> None:

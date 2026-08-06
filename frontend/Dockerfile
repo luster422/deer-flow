@@ -22,6 +22,7 @@ RUN pnpm config set store-dir ${PNPM_STORE_PATH}
 RUN if [ -n "${NPM_REGISTRY}" ]; then pnpm config set registry "${NPM_REGISTRY}"; fi
 WORKDIR /app
 COPY frontend ./frontend
+COPY contracts ./contracts
 
 # ── Dev: install only, CMD is overridden by docker-compose ───────────────────
 FROM base AS dev

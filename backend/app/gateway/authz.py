@@ -58,6 +58,11 @@ class Permissions:
     RUNS_READ = "runs:read"
     RUNS_CANCEL = "runs:cancel"
 
+    # Knowledge bases
+    KNOWLEDGE_BASES_READ = "knowledge_bases:read"
+    KNOWLEDGE_BASES_WRITE = "knowledge_bases:write"
+    KNOWLEDGE_BASES_DELETE = "knowledge_bases:delete"
+
 
 class AuthContext:
     """Authentication context for the current request.
@@ -116,6 +121,9 @@ _ALL_PERMISSIONS: list[str] = [
     Permissions.RUNS_CREATE,
     Permissions.RUNS_READ,
     Permissions.RUNS_CANCEL,
+    Permissions.KNOWLEDGE_BASES_READ,
+    Permissions.KNOWLEDGE_BASES_WRITE,
+    Permissions.KNOWLEDGE_BASES_DELETE,
 ]
 
 

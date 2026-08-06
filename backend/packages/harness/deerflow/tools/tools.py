@@ -101,6 +101,10 @@ def get_available_tools(
         from deerflow.tools.skill_manage_tool import skill_manage_tool
 
         builtin_tools.append(skill_manage_tool)
+    if getattr(getattr(config, "knowledge", None), "enabled", False):
+        from deerflow.knowledge.tools import knowledge_search
+
+        builtin_tools.append(knowledge_search)
 
     # Add subagent tools only if enabled via runtime parameter
     if subagent_enabled:

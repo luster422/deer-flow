@@ -190,6 +190,7 @@ _FRAMEWORK_STRUCTURED_TAGS = [
     "available_skills",
     "disabled_skills",
     "memory_tool_system",
+    "knowledge_tool_system",
     "durable_context_data",
     "slash_skill_activation",
     "system_reminder",

@@ -58,6 +58,7 @@ _REMOTE_CONTENT_TOOL_NAMES: frozenset[str] = frozenset(
         "web_search",
         "image_search",
         "web_capture",
+        "knowledge_search",
     }
 )
 

@@ -15,6 +15,10 @@ export function explainLastToolCall(message: AIMessage, t: Translations) {
 export function explainToolCall(toolCall: ToolCall, t: Translations) {
   if (toolCall.name === "web_search" || toolCall.name === "image_search") {
     return t.toolCalls.searchFor(toolCall.args.query);
+  } else if (toolCall.name === "knowledge_search") {
+    return typeof toolCall.args.query === "string"
+      ? t.toolCalls.searchKnowledgeFor(toolCall.args.query)
+      : t.toolCalls.searchKnowledge;
   } else if (toolCall.name === "web_fetch") {
     return t.toolCalls.viewWebPage;
   } else if (toolCall.name === "present_files") {

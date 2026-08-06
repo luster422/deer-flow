@@ -4,6 +4,7 @@ import { getBackendBaseURL } from "@/core/config";
 export interface FeaturesResponse {
   agents_api: { enabled: boolean };
   browser_control?: { enabled: boolean };
+  knowledge_bases?: { enabled: boolean };
 }
 
 export async function fetchFeatures(): Promise<FeaturesResponse> {
@@ -20,4 +21,8 @@ export async function fetchAgentsApiEnabled(): Promise<boolean> {
 
 export async function fetchBrowserControlEnabled(): Promise<boolean> {
   return (await fetchFeatures()).browser_control?.enabled ?? false;
+}
+
+export async function fetchKnowledgeBasesEnabled(): Promise<boolean> {
+  return (await fetchFeatures()).knowledge_bases?.enabled ?? false;
 }

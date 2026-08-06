@@ -28,11 +28,18 @@ class BrowserControlFeature(BaseModel):
     enabled: bool = Field(..., description="Whether the live browser routes and UI are available")
 
 
+class KnowledgeBasesFeature(BaseModel):
+    """Availability of knowledge-base management and retrieval."""
+
+    enabled: bool = Field(..., description="Whether knowledge-base routes, ingestion, and the agent retrieval tool are active")
+
+
 class FeaturesResponse(BaseModel):
     """Frontend-facing feature availability flags."""
 
     agents_api: AgentsApiFeature
     browser_control: BrowserControlFeature
+    knowledge_bases: KnowledgeBasesFeature
 
 
 @router.get(
@@ -47,4 +54,5 @@ async def list_features(config: AppConfig = Depends(get_config)) -> FeaturesResp
     return FeaturesResponse(
         agents_api=AgentsApiFeature(enabled=config.agents_api.enabled),
         browser_control=BrowserControlFeature(enabled=browser.available),
+        knowledge_bases=KnowledgeBasesFeature(enabled=config.knowledge.enabled),
     )

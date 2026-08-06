@@ -401,6 +401,7 @@ async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGen
             app.state.run_store = MemoryRunStore()
             app.state.feedback_repo = None
 
+        from deerflow.knowledge.manager import set_knowledge_manager
         from deerflow.persistence.thread_meta import make_thread_store
 
         app.state.thread_store = make_thread_store(sf, app.state.store)
@@ -412,9 +413,30 @@ async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGen
 
             app.state.scheduled_task_repo = ScheduledTaskRepository(sf)
             app.state.scheduled_task_run_repo = ScheduledTaskRunRepository(sf)
+            from deerflow.persistence.knowledge import KnowledgeRepository
+
+            app.state.knowledge_repository = KnowledgeRepository(sf)
+            app.state.knowledge_config = config.knowledge
+            if config.knowledge.enabled:
+                from app.knowledge.runtime import build_knowledge_runtime
+
+                knowledge_runtime = build_knowledge_runtime(config, app.state.knowledge_repository)
+                app.state.knowledge_manager = knowledge_runtime.manager
+                app.state.knowledge_ingestion_service = knowledge_runtime.ingestion_service
+                app.state.knowledge_storage = knowledge_runtime.storage
+            else:
+                set_knowledge_manager(None)
+                app.state.knowledge_manager = None
+                app.state.knowledge_ingestion_service = None
+                app.state.knowledge_storage = None
         else:
+            set_knowledge_manager(None)
             app.state.scheduled_task_repo = None
             app.state.scheduled_task_run_repo = None
+            app.state.knowledge_repository = None
+            app.state.knowledge_manager = None
+            app.state.knowledge_ingestion_service = None
+            app.state.knowledge_storage = None
 
         # Run event store. The store and the matching ``run_events_config`` are
         # both frozen at startup so ``get_run_context`` does not combine a
@@ -480,6 +502,7 @@ async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGen
         try:
             yield
         finally:
+            set_knowledge_manager(None)
             # Drain in-flight run tasks BEFORE the AsyncExitStack tears down the
             # checkpointer (and its connection pool). A run still mid-graph would
             # otherwise leak into asyncio.run() shutdown, where langgraph's

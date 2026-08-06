@@ -204,6 +204,38 @@ describe("MessageGroup", () => {
     expect(visibleHtml).toContain('decoding="async"');
     expect(deferredHtml).not.toContain("<img");
   });
+
+  it("renders knowledge search query and protected source links", () => {
+    const html = renderGroup([
+      {
+        id: "ai-knowledge",
+        type: "ai",
+        content: "",
+        tool_calls: [
+          {
+            id: "call-knowledge",
+            name: "knowledge_search",
+            args: { query: "refund policy" },
+          },
+        ],
+      } as Message,
+      {
+        id: "tool-knowledge",
+        type: "tool",
+        name: "knowledge_search",
+        tool_call_id: "call-knowledge",
+        content:
+          "1. [citation:handbook.md](/api/knowledge-bases/kb-1/documents/doc-1/content?chunk_id=doc-1%3A1%3A0)\nRefunds take five days.",
+      } as Message,
+    ]);
+
+    expect(html).toContain("Search knowledge for &quot;refund policy&quot;");
+    expect(html).toContain("handbook.md");
+    expect(html).toContain(
+      "/api/knowledge-bases/kb-1/documents/doc-1/content?chunk_id=doc-1%3A1%3A0",
+    );
+    expect(html).not.toContain("Refunds take five days");
+  });
 });
 
 function renderGroup(

@@ -152,6 +152,7 @@ import {
   readGoalResponseError,
   type SlashSuggestion,
 } from "./input-box-helpers";
+import { KnowledgeBaseSelector } from "./knowledge-base-selector";
 import { useThread } from "./messages/context";
 import { ModeHoverGuide } from "./mode-hover-guide";
 import { ReferenceAttachmentSummary, useMaybeSidecar } from "./sidecar";
@@ -2266,6 +2267,10 @@ export function InputBox({
               className="px-2!"
               disabled={composerLocked}
               uploadLimits={uploadLimits}
+            />
+            <KnowledgeBaseSelector
+              threadId={threadId}
+              disabled={composerLocked}
             />
             <VoiceInputButton
               disabled={composerLocked}

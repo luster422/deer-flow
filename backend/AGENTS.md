@@ -363,7 +363,7 @@ Setup: Copy `config.example.yaml` to `config.yaml` in the **project root** direc
 
 **Config Hot-Reload Boundary**: Gateway dependencies route through `get_app_config()` on every request, so per-run fields like `models[*].max_tokens`, `summarization.*`, `title.*`, `memory.*`, `subagents.*`, `tools[*]`, and the agent system prompt pick up `config.yaml` edits on the next message. `AppConfig` is intentionally **not** cached on `app.state` — `lifespan()` keeps a local `startup_config` variable for one-shot bootstrap work and passes it to `langgraph_runtime(app, startup_config)`.
 
-Infrastructure fields are **restart-required**. The authoritative list lives in `packages/harness/deerflow/config/reload_boundary.py::STARTUP_ONLY_FIELDS` and is mirrored by the standardised `"startup-only:"` prefix on the corresponding `Field(description=...)` in `AppConfig`, so IDE hover on those fields surfaces the reason inline (no need to context-switch into this table). Currently registered: `database`, `checkpointer`, `run_events`, `stream_bridge`, `sandbox`, `log_level`, `logging`, `channels`, `channel_connections`, `scheduler`, `run_ownership`. Adding a new restart-required field requires updating the registry; drift is pinned by `tests/test_reload_boundary.py`.
+Infrastructure fields are **restart-required**. The authoritative list lives in `packages/harness/deerflow/config/reload_boundary.py::STARTUP_ONLY_FIELDS` and is mirrored by the standardised `"startup-only:"` prefix on the corresponding `Field(description=...)` in `AppConfig`, so IDE hover on those fields surfaces the reason inline (no need to context-switch into this table). Currently registered: `database`, `checkpointer`, `run_events`, `stream_bridge`, `sandbox`, `log_level`, `logging`, `channels`, `channel_connections`, `scheduler`, `run_ownership`, `knowledge`. Adding a new restart-required field requires updating the registry; drift is pinned by `tests/test_reload_boundary.py`.
 
 **Persistence backend resolution**: the unified `database` section selects the
 Gateway's LangGraph checkpointer, LangGraph Store, and DeerFlow SQL repositories.
@@ -962,6 +962,13 @@ Config is env-driven like the others — `MonocleTracingConfig`, built in `get_t
 - `summarization` - Context summarization (enabled, trigger conditions, keep policy)
 - `subagents.enabled` - Master switch for subagent delegation
 - `memory` - Memory system (enabled, storage_path, debounce_seconds, shutdown_flush_timeout_seconds, model_name, max_facts, fact_confidence_threshold, injection_enabled, max_injection_tokens, staleness_review_enabled, staleness_age_days, staleness_min_candidates, staleness_max_removals_per_cycle, staleness_protected_categories, staleness_max_lifetime_multiplier, staleness_max_extension_days)
+- `knowledge` - Optional RAG subsystem (default disabled): parser, Markdown chunking, embedding provider, local hybrid index, retrieval limits, and ingestion worker leases. The entire section is startup-only.
+
+### Knowledge Bases / RAG
+
+Knowledge bases are a separate domain from Memory. `deerflow.knowledge` owns parser/embedding/index protocols, structure-aware chunking, hybrid retrieval, the retrieval manager, and `knowledge_search`; it must not import `app.*`. `app.knowledge` owns user-scoped source files and the ingestion worker. SQL metadata and bindings live under `deerflow.persistence.knowledge`, with Alembic revision `0008_knowledge_bases`; the SQLite FTS/vector index is derived state and can be rebuilt.
+
+Every repository and index operation carries `user_id`. Agent calls derive that ID plus thread/agent bindings from trusted runtime context; the model-facing tool schema intentionally has no `user_id` or `knowledge_base_ids`. Thread binding strategy is stored separately from binding rows so `replace` with an empty list remains distinguishable from no thread override. Retrieved passages are included in the tool-result sanitization allowlist, compact model content carries protected `[citation:filename](/api/knowledge-bases/.../content?chunk_id=...)` links, and complete source metadata stays in the tool artifact.
 
 **`extensions_config.json`**:
 - `mcpServers` - Map of server name → config (enabled, type, command, args, env, url, headers, oauth, description, `routing`, `tools`, `tool_call_timeout`). `routing.mode="prefer"` emits `<mcp_routing_hints>` prompt guidance; if `tool_search` defers the hinted tool, `McpRoutingMiddleware` can also auto-promote matching deferred schemas before the model call. It does not hard-disable other tools.

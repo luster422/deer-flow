@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchBrowserControlEnabled } from "./api";
+import { fetchBrowserControlEnabled, fetchKnowledgeBasesEnabled } from "./api";
 
 export function useBrowserControlEnabled() {
   const { data, isPending } = useQuery({
@@ -15,4 +15,13 @@ export function useBrowserControlEnabled() {
     enabled: data ?? false,
     isLoading: isPending,
   };
+}
+
+export function useKnowledgeBasesEnabled() {
+  const { data, isPending } = useQuery({
+    queryKey: ["features", "knowledge_bases"],
+    queryFn: fetchKnowledgeBasesEnabled,
+    retry: false,
+  });
+  return { enabled: data ?? false, isLoading: isPending };
 }
