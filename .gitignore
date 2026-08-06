@@ -69,3 +69,12 @@ config.yaml.bak
 
 # Monocle agent-observability trace output (local file exporter)
 .monocle/
+
+# Graphify generated knowledge graph (local analysis artifact)
+graphify-out/
+
+# Local TypeScript backend experiment (not part of the main monorepo)
+deer-flow-ts/
+
+# Local-only RAG smoke-test embedder (no external API key)
+backend/app/knowledge/_rag_test_embedder.py
