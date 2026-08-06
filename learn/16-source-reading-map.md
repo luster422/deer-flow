@@ -174,6 +174,21 @@
 
 目标：画出五类存储职责图。
 
+### Knowledge / RAG
+
+1. `docs/plans/2026-07-31-rag-design.md`
+2. `deerflow/knowledge/ports.py` / `types.py` / `config.py`
+3. `deerflow/knowledge/chunking/markdown.py`
+4. `deerflow/knowledge/retrieval/local.py`
+5. `deerflow/knowledge/manager.py` / `tools.py`
+6. `deerflow/persistence/knowledge/*` + `migrations/versions/0008_knowledge_bases.py`
+7. `app/knowledge/{runtime,ingestion,storage}.py`
+8. `app/gateway/routers/knowledge_bases.py`
+9. `frontend/src/core/knowledge/*` + `app/workspace/knowledge-bases/page.tsx`
+10. `frontend/src/components/workspace/knowledge-base-selector.tsx`
+
+目标：说清入库、绑定、混合检索与 `knowledge_search` 的权限边界。详见 `23-knowledge-rag.md`。
+
 ## 11. 第十遍：Streaming Frontend
 
 1. `frontend/src/core/threads/types.ts`

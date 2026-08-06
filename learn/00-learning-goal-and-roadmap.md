@@ -37,6 +37,8 @@ flowchart TD
     Capabilities --> Sandbox[Sandbox 与安全]
     AgentCore --> Subagents[Subagent 协作]
     AgentCore --> Memory[Memory 与持久化]
+    AgentCore --> Knowledge[Knowledge / RAG]
+    Memory --> Knowledge
     Gateway --> Runtime[Run 生命周期与 Streaming]
     Runtime --> Frontend[前端状态投影]
     Runtime --> Observability[事件、Tracing 与测试]
@@ -80,7 +82,7 @@ flowchart TD
 
 ### 阶段三：掌握生产级能力
 
-学习文档：`08、09、10、11、12、13、17`。
+学习文档：`08、09、10、11、23、12、13、17`。
 
 你需要理解：
 
@@ -89,11 +91,12 @@ flowchart TD
 - request-scoped secrets 如何避免进入 prompt、command、checkpoint 和 trace。
 - Subagent 如何共享线程工作区但隔离推理上下文。
 - Checkpoint、Store、Repository、Memory 和 Stream 各自解决什么问题。
+- Knowledge RAG 与 Memory/Uploads/Web Search 的边界，以及线程绑定、混合检索、`knowledge_search` 安全契约。
 - 前端如何合并历史、实时与乐观状态。
 - LangGraph 远程 SDK 与嵌入式 `DeerFlowClient` 为什么共享 Agent 内核却保留两条执行路径。
 - 为什么 Agent 测试要覆盖确定性逻辑、协议、运行时和端到端行为。
 
-阶段产出：设计一个可安全执行的自定义能力，并完成威胁模型和测试计划。
+阶段产出：设计一个可安全执行的自定义能力，并完成威胁模型和测试计划；另完成一次“上传 → 绑定 → 检索引用”的 RAG 闭环。
 
 ### 阶段四：面试表达与综合实践
 
@@ -118,7 +121,7 @@ flowchart TD
 | 第 3 周 | DeerFlow 架构、Gateway、请求链路与官方 Server 对照 | Gateway 生命周期图、官方 vs 嵌入式时序对比、取舍表 |
 | 第 4 周 | Agent、Middleware 与上下文工程 | Middleware 顺序表 |
 | 第 5 周 | Tool、Skill、MCP、Sandbox、安全 | 一个安全 Tool 设计 |
-| 第 6 周 | Subagent、Memory、Persistence | 数据边界与一致性图 |
+| 第 6 周 | Subagent、Memory、Persistence、Knowledge RAG | 数据边界、RAG 绑定与一致性图 |
 | 第 7 周 | Streaming、Frontend、SDK、Observability、Testing | 一份 SDK 选型与故障排查手册 |
 | 第 8 周 | 实战与面试 | Demo、复盘、模拟面试 |
 

@@ -8,7 +8,7 @@
 
 1. 从浏览器输入开始，完整讲出请求经过 Nginx、Gateway、RunManager、LangGraph、StreamBridge 再回到前端的链路。
 2. 区分 LangChain、LangGraph 与 DeerFlow 自有抽象，不把 `Thread`、`Run`、`Checkpoint`、`RunEvent`、`Store` 混为一谈。
-3. 解释 Lead Agent、Middleware、ThreadState、Tool、Skill、MCP、Sandbox、Subagent、Memory 的职责与协作方式。
+3. 解释 Lead Agent、Middleware、ThreadState、Tool、Skill、MCP、Sandbox、Subagent、Memory、Knowledge RAG 的职责与协作方式。
 4. 解释流式输出、取消、重连、分支、重生成、上下文压缩和人工输入为何需要状态机与并发控制。
 5. 识别 Agent 工程中的提示词注入、工具越权、秘密泄漏、路径逃逸、循环调用、阻塞 I/O 和多实例一致性风险。
 6. 独立完成一个带状态、工具、持久化、流式 UI、可观测性和测试的 Agent 功能。
@@ -41,24 +41,25 @@
 | 上下文 | [20 提示词与上下文工程](20-prompt-engineering.md) | Prompt、动态上下文、Tool Schema 与硬约束如何协作？ |
 | 后端 | [21 Provider 设计模式](21-provider-design-pattern.md) | 可替换能力、配置解析、生命周期与错误契约如何设计？ |
 | 取舍 | [22 官方 Server 与嵌入式运行时](22-langgraph-server-vs-embedded-runtime.md) | 相对原版 LangChain/LangGraph，DeerFlow 保留了什么、改了什么？ |
+| 数据 | [23 Knowledge Bases / RAG](23-knowledge-rag.md) | 文档知识库如何入库、绑定、混合检索并由 Agent 按需引用？ |
 
 ## 推荐学习顺序
 
 ### 路线 A：第一次接触 Agent 开发
 
-按 `00 → 01 → 19 → 21 → 05 → 06 → 03 → 07 → 20 → 18 → 02 → 22 → 08 → 10 → 11 → 12 → 17 → 13 → 15` 学习。先建立系统和后端模块地图，再深入 Provider 边界，然后理解框架概念、提示词与上下文分层、Gateway 控制面、与官方 Server 的取舍，以及生产级能力和 SDK 接入边界。
+按 `00 → 01 → 19 → 21 → 05 → 06 → 03 → 07 → 20 → 18 → 02 → 22 → 08 → 10 → 11 → 23 → 12 → 17 → 13 → 15` 学习。先建立系统和后端模块地图，再深入 Provider 边界，然后理解框架概念、提示词与上下文分层、Gateway 控制面、与官方 Server 的取舍，以及 Memory/RAG、生产级能力和 SDK 接入边界。
 
 ### 路线 B：已有 LangChain/LangGraph 经验
 
-按 `01 → 19 → 21 → 02 → 22 → 18 → 03 → 04 → 07 → 20 → 10 → 11 → 12 → 17 → 09 → 13` 学习。先掌握后端静态模块和 Provider 边界，再对照官方 Server 与嵌入式运行时的取舍，关注 Gateway 控制面、DeerFlow 的生产化封装、上下文运行时、远程/嵌入式接入。
+按 `01 → 19 → 21 → 02 → 22 → 18 → 03 → 04 → 07 → 20 → 10 → 11 → 23 → 12 → 17 → 09 → 13` 学习。先掌握后端静态模块和 Provider 边界，再对照官方 Server 与嵌入式运行时的取舍，关注 Gateway 控制面、DeerFlow 的生产化封装、上下文运行时、Memory/RAG 与远程/嵌入式接入。
 
 ### 路线 C：准备面试
 
-先快速阅读 `01、19、21、02、22、18、03、06、07、20、08、10、11、12、17`，再完成 `14` 中的问题；回答时使用“概念 → DeerFlow 实现 → 设计取舍 → 故障场景”四段式。
+先快速阅读 `01、19、21、02、22、18、03、06、07、20、08、10、11、23、12、17`，再完成 `14` 中的问题；回答时使用“概念 → DeerFlow 实现 → 设计取舍 → 故障场景”四段式。
 
 ### 路线 D：准备参与项目开发
 
-先阅读 `16` 和 `19`，分别建立源码阅读顺序与模块所有权地图；新增或修改可替换实现时阅读 `21`，涉及 Agent 行为、上下文注入或模型可见 Tools 时继续阅读 `20`，再根据改动模块选择其他专题文档。修改代码时同时核对仓库根目录、`backend/AGENTS.md` 或 `frontend/AGENTS.md` 中的开发约束。
+先阅读 `16` 和 `19`，分别建立源码阅读顺序与模块所有权地图；新增或修改可替换实现时阅读 `21`，涉及 Agent 行为、上下文注入或模型可见 Tools 时继续阅读 `20`，涉及文档知识库/RAG 时阅读 `23`，再根据改动模块选择其他专题文档。修改代码时同时核对仓库根目录、`backend/AGENTS.md` 或 `frontend/AGENTS.md` 中的开发约束。
 
 ## 每章建议学习法
 
